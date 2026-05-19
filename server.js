@@ -32,6 +32,5 @@ app.get('/search', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('ok'));
-
+app.get('/', (req, res) => res.send('ok'));app.get('/robots.txt', (req, res) => res.send('User-agent: *\nAllow: /'));
 app.listen(process.env.PORT || 3333, () => console.log('ready'));
