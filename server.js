@@ -1,3 +1,4 @@
+cat > ~/memory-proxy/server.js << 'EOF'
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
@@ -7,7 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/embed', async (req, res) => {
-  const { text, apiKey } = req.body;
+  const { text } = req.body;
+  const apiKey = process.env.SF_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'SF_KEY not set' });
   try {
     const response = await axios.post('https://api.siliconflow.cn/v1/embeddings', {
       model: 'BAAI/bge-large-zh-v1.5',
@@ -22,4 +25,5 @@ app.post('/embed', async (req, res) => {
   }
 });
 
-app.listen(3333, () => console.log('ready on http://localhost:3333'));
+app.listen(process.env.PORT || 3333, () => console.log('ready'));
+EOF
