@@ -1,4 +1,3 @@
-cat > ~/memory-proxy/server.js << 'EOF'
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
@@ -26,4 +25,3 @@ app.post('/embed', async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3333, () => console.log('ready'));
-EOF
