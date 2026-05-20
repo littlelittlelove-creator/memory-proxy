@@ -9,7 +9,7 @@ app.use(express.json());
 const SUPABASE_URL = 'https://czkvbphoyznniqkapyma.supabase.co';
 
 app.get('/search', async (req, res) => {
-  const { q, threshold = '0.3', count = '5' } = req.query;
+  const { q, threshold = '0.3', count = '5', slim = 'false' } = req.query;
   const sfKey = process.env.SF_KEY;
   const sbKey = process.env.SB_KEY;
   if (!sfKey || !sbKey) return res.status(500).json({ error: 'keys not set' });
@@ -26,7 +26,12 @@ app.get('/search', async (req, res) => {
       match_threshold: parseFloat(threshold),
       match_count: parseInt(count)
     }, { headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey } });
-    res.json(matchRes.data);
+    
+    const data = slim === 'true'
+      ? matchRes.data.map(r => ({ id: r.id, content: r.content, similarity: r.similarity }))
+      : matchRes.data;
+    
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
