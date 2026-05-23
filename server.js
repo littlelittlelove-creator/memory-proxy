@@ -38,4 +38,24 @@ app.get('/search', async (req, res) => {
 });
 
 app.get('/', (req, res) => res.send('ok'));app.get('/robots.txt', (req, res) => res.send('User-agent: *\nAllow: /'));
+app.get('/timeline', async (req, res) => {
+  const { q, limit = '20' } = req.query;
+  const sbKey = process.env.SB_KEY;
+  if (!sbKey) return res.status(500).json({ error: 'keys not set' });
+  if (!q) return res.status(400).json({ error: 'missing q' });
+  try {
+    const searchRes = await axios.get(SUPABASE_URL + '/rest/v1/memories', {
+      params: {
+        content: `ilike.*${q}*`,
+        order: 'created_at.asc',
+        limit: parseInt(limit),
+        select: 'id,content,created_at,metadata'
+      },
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+    res.json(searchRes.data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 app.listen(process.env.PORT || 3333, () => console.log('ready'));
