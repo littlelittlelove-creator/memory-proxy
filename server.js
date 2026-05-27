@@ -58,4 +58,17 @@ app.get('/timeline', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+app.get('/state', async (req, res) => {
+  const sbKey = process.env.SB_KEY;
+  if (!sbKey) return res.status(500).json({ error: 'keys not set' });
+  try {
+    const stateRes = await axios.get(SUPABASE_URL + '/rest/v1/cognitive_state', {
+      params: { id: 'eq.1', select: 'content,updated_at' },
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+    res.json(stateRes.data[0] || {});
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 app.listen(process.env.PORT || 3333, () => console.log('ready'));
