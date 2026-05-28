@@ -27,9 +27,9 @@ app.get('/search', async (req, res) => {
       match_count: parseInt(count)
     }, { headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey } });
     
-    const data = slim === 'true'
-      ? matchRes.data.map(r => ({ id: r.id, content: r.content, similarity: r.similarity }))
-      : matchRes.data;
+  const data = slim === 'true'
+  ? matchRes.data.map(r => ({ id: r.id, content: r.content, similarity: r.similarity, created_at: r.created_at }))
+  : matchRes.data;
     
     res.json(data);
   } catch (e) {
