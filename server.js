@@ -27,10 +27,18 @@ app.get('/search', async (req, res) => {
       match_count: parseInt(count)
     }, { headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey } });
     
-  const data = slim === 'true'
-  ? matchRes.data.map(r => ({ id: r.id, content: r.content, similarity: r.similarity, created_at: r.created_at }))
-  : matchRes.data;
-    
+const data = slim === 'true'
+      ? matchRes.data.map(r => ({ id: r.id, content: r.content, similarity: r.similarity, created_at: r.created_at }))
+      : matchRes.data;
+
+    // 更新 access_count 和 last_accessed_at
+    const ids = matchRes.data.map(r => r.id);
+    if (ids.length > 0) {
+      await axios.post(SUPABASE_URL + '/rest/v1/rpc/increment_access', {
+        memory_ids: ids
+      }, { headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey } });
+    }
+
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
